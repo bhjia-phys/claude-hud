@@ -19,6 +19,7 @@ let resolveKeychainCredentials;
 let getUsageApiTimeoutMs;
 let isNoProxy;
 let getProxyUrl;
+let getProxyTunnelRejectUnauthorized;
 let parseRetryAfterSeconds;
 let USAGE_API_USER_AGENT;
 
@@ -55,6 +56,7 @@ before(async () => {
     getUsageApiTimeoutMs,
     isNoProxy,
     getProxyUrl,
+    getProxyTunnelRejectUnauthorized,
     parseRetryAfterSeconds,
     USAGE_API_USER_AGENT,
   } = await import(`../dist/usage-api.js?cacheBust=${Date.now()}`));
@@ -1021,6 +1023,24 @@ describe('getUsage', () => {
       restoreEnvVar('HTTPS_PROXY', originalHttpsProxy);
       restoreEnvVar('CLAUDE_HUD_USAGE_TIMEOUT_MS', originalUsageTimeout);
     }
+  });
+});
+
+describe('getProxyTunnelRejectUnauthorized', () => {
+  test('defaults to strict TLS when no override is set', () => {
+    assert.equal(getProxyTunnelRejectUnauthorized(undefined, {}), true);
+  });
+
+  test('respects an explicit request override first', () => {
+    assert.equal(getProxyTunnelRejectUnauthorized(false, {}), false);
+  });
+
+  test('respects NODE_TLS_REJECT_UNAUTHORIZED=0 for proxy tunnels', () => {
+    assert.equal(getProxyTunnelRejectUnauthorized(undefined, { NODE_TLS_REJECT_UNAUTHORIZED: '0' }), false);
+  });
+
+  test('keeps TLS verification enabled for non-zero env values', () => {
+    assert.equal(getProxyTunnelRejectUnauthorized(undefined, { NODE_TLS_REJECT_UNAUTHORIZED: '1' }), true);
   });
 });
 

@@ -967,7 +967,7 @@ function createProxyTunnelAgent(proxyUrl: URL): https.Agent {
           const tlsSocket = tls.connect({
             socket: proxySocket,
             servername: String(options.servername ?? targetHost),
-            rejectUnauthorized: options.rejectUnauthorized !== false,
+            rejectUnauthorized: getProxyTunnelRejectUnauthorized(options.rejectUnauthorized),
           }, () => {
             settle(null, tlsSocket);
           });
@@ -988,6 +988,17 @@ function createProxyTunnelAgent(proxyUrl: URL): https.Agent {
       return undefined;
     }
   }();
+}
+
+export function getProxyTunnelRejectUnauthorized(
+  rejectUnauthorized: https.RequestOptions['rejectUnauthorized'],
+  env: NodeJS.ProcessEnv = process.env
+): boolean {
+  if (rejectUnauthorized === false) {
+    return false;
+  }
+
+  return env.NODE_TLS_REJECT_UNAUTHORIZED !== '0';
 }
 
 function fetchUsageApi(accessToken: string): Promise<UsageApiResult> {
