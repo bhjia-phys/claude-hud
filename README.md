@@ -147,7 +147,7 @@ Edit `~/.claude/plugins/claude-hud/config.json` directly for advanced settings s
 | `gitStatus.showFileStats` | boolean | false | Show file change counts `!M +A ✘D ?U` |
 | `display.showModel` | boolean | true | Show model name `[Opus]` |
 | `display.showContextBar` | boolean | true | Show visual context bar `████░░░░░░` |
-| `display.contextValue` | `percent` \| `tokens` \| `remaining` | `percent` | Context display format (`45%`, `45k/200k`, or `55%` remaining) |
+| `display.contextValue` | `percent` \| `tokens` \| `remaining` \| `both` | `percent` | Context display format (`45%`, `45k/200k`, `55%` remaining, or `45% (45k/200k)`) |
 | `display.showConfigCounts` | boolean | false | Show CLAUDE.md, rules, MCPs, hooks counts |
 | `display.showDuration` | boolean | false | Show session duration `⏱️ 5m` |
 | `display.showSpeed` | boolean | false | Show output token speed `out: 42.1 tok/s` |
