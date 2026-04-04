@@ -148,10 +148,10 @@ function getPathCandidates(command: string): string[] {
 
   const pathExt = (process.env.PATHEXT || '.COM;.EXE;.BAT;.CMD')
     .split(';')
-    .map((value) => value.trim())
+    .map((value: string) => value.trim())
     .filter(Boolean);
 
-  return [command, ...pathExt.map((suffix) => `${command}${suffix.toLowerCase()}`), ...pathExt.map((suffix) => `${command}${suffix.toUpperCase()}`)];
+  return [command, ...pathExt.map((suffix: string) => `${command}${suffix.toLowerCase()}`), ...pathExt.map((suffix: string) => `${command}${suffix.toUpperCase()}`)];
 }
 
 function resolveClaudeBinaryFromPath(): ClaudeBinaryInfo | null {
