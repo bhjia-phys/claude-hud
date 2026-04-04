@@ -14,6 +14,7 @@ export const DEFAULT_ELEMENT_ORDER = [
 ];
 const KNOWN_ELEMENTS = new Set(DEFAULT_ELEMENT_ORDER);
 export const DEFAULT_CONFIG = {
+    language: 'en',
     lineLayout: 'expanded',
     showSeparators: false,
     pathLevels: 1,
@@ -78,6 +79,9 @@ function validateAutocompactBuffer(value) {
 }
 function validateContextValue(value) {
     return value === 'percent' || value === 'tokens' || value === 'remaining' || value === 'both';
+}
+function validateLanguage(value) {
+    return value === 'en' || value === 'zh';
 }
 function validateModelFormat(value) {
     return value === 'full' || value === 'compact' || value === 'short';
@@ -156,6 +160,9 @@ function validateThreshold(value, max = 100) {
 }
 export function mergeConfig(userConfig) {
     const migrated = migrateConfig(userConfig);
+    const language = validateLanguage(migrated.language)
+        ? migrated.language
+        : DEFAULT_CONFIG.language;
     const lineLayout = validateLineLayout(migrated.lineLayout)
         ? migrated.lineLayout
         : DEFAULT_CONFIG.lineLayout;
@@ -280,20 +287,20 @@ export function mergeConfig(userConfig) {
             ? migrated.colors.custom
             : DEFAULT_CONFIG.colors.custom,
     };
-    return { lineLayout, showSeparators, pathLevels, elementOrder, gitStatus, display, colors };
+    return { language, lineLayout, showSeparators, pathLevels, elementOrder, gitStatus, display, colors };
 }
 export async function loadConfig() {
     const configPath = getConfigPath();
     try {
         if (!fs.existsSync(configPath)) {
-            return DEFAULT_CONFIG;
+            return mergeConfig({});
         }
         const content = fs.readFileSync(configPath, 'utf-8');
         const userConfig = JSON.parse(content);
         return mergeConfig(userConfig);
     }
     catch {
-        return DEFAULT_CONFIG;
+        return mergeConfig({});
     }
 }
 //# sourceMappingURL=config.js.map

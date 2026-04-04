@@ -1,6 +1,7 @@
 import { getModelName, formatModelName, getProviderLabel } from '../../stdin.js';
 import { getOutputSpeed } from '../../speed-tracker.js';
 import { git as gitColor, gitBranch as gitBranchColor, label, model as modelColor, project as projectColor, custom as customColor } from '../colors.js';
+import { t } from '../../i18n/index.js';
 export function renderProjectLine(ctx) {
     const display = ctx.config?.display;
     const colors = ctx.config?.colors;
@@ -73,7 +74,7 @@ export function renderProjectLine(ctx) {
     if (display?.showSpeed) {
         const speed = getOutputSpeed(ctx.stdin);
         if (speed !== null) {
-            parts.push(label(`out: ${speed.toFixed(1)} tok/s`, colors));
+            parts.push(label(`${t('format.out')}: ${speed.toFixed(1)} ${t('format.tokPerSec')}`, colors));
         }
     }
     if (display?.showDuration !== false && ctx.sessionDuration) {

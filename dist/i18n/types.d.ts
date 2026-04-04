@@ -1,0 +1,4 @@
+export type MessageKey = "label.context" | "label.usage" | "label.approxRam" | "label.rules" | "label.hooks" | "status.limitReached" | "status.allTodosComplete" | "format.resets" | "format.resetsIn" | "format.in" | "format.cache" | "format.out" | "format.tokPerSec" | "init.initializing" | "init.macosNote";
+export type Messages = Record<MessageKey, string>;
+export type Language = "en" | "zh";
+//# sourceMappingURL=types.d.ts.map

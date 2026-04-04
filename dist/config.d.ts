@@ -1,3 +1,4 @@
+import type { Language } from './i18n/types.js';
 export type LineLayoutType = 'compact' | 'expanded';
 export type AutocompactBufferMode = 'enabled' | 'disabled';
 export type ContextValueMode = 'percent' | 'tokens' | 'remaining' | 'both';
@@ -28,6 +29,7 @@ export interface HudColorOverrides {
 }
 export declare const DEFAULT_ELEMENT_ORDER: HudElement[];
 export interface HudConfig {
+    language: Language;
     lineLayout: LineLayoutType;
     showSeparators: boolean;
     pathLevels: 1 | 2 | 3;

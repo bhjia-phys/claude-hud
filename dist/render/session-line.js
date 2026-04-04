@@ -3,6 +3,7 @@ import { getContextPercent, getBufferedPercent, getModelName, formatModelName, g
 import { getOutputSpeed } from '../speed-tracker.js';
 import { coloredBar, critical, git as gitColor, gitBranch as gitBranchColor, label, model as modelColor, project as projectColor, getContextColor, getQuotaColor, quotaBar, custom as customColor, RESET } from './colors.js';
 import { getAdaptiveBarWidth } from '../utils/terminal.js';
+import { t } from '../i18n/index.js';
 const DEBUG = process.env.DEBUG?.includes('claude-hud') || process.env.DEBUG === '*';
 /**
  * Renders the full session line (model + context bar + project + git + counts + usage + duration).
@@ -113,13 +114,13 @@ export function renderSessionLine(ctx) {
                 parts.push(label(`${ctx.claudeMdCount} CLAUDE.md`, colors));
             }
             if (ctx.rulesCount > 0) {
-                parts.push(label(`${ctx.rulesCount} rules`, colors));
+                parts.push(label(`${ctx.rulesCount} ${t('label.rules')}`, colors));
             }
             if (ctx.mcpCount > 0) {
                 parts.push(label(`${ctx.mcpCount} MCPs`, colors));
             }
             if (ctx.hooksCount > 0) {
-                parts.push(label(`${ctx.hooksCount} hooks`, colors));
+                parts.push(label(`${ctx.hooksCount} ${t('label.hooks')}`, colors));
             }
         }
     }
@@ -129,7 +130,7 @@ export function renderSessionLine(ctx) {
             const resetTime = ctx.usageData.fiveHour === 100
                 ? formatResetTime(ctx.usageData.fiveHourResetAt)
                 : formatResetTime(ctx.usageData.sevenDayResetAt);
-            parts.push(critical(`⚠ Limit reached${resetTime ? ` (resets ${resetTime})` : ''}`, colors));
+            parts.push(critical(`⚠ ${t('status.limitReached')}${resetTime ? ` (${t('format.resets')} ${resetTime})` : ''}`, colors));
         }
         else {
             const usageThreshold = display?.usageThreshold ?? 0;
@@ -182,7 +183,7 @@ export function renderSessionLine(ctx) {
     if (display?.showSpeed) {
         const speed = getOutputSpeed(ctx.stdin);
         if (speed !== null) {
-            parts.push(label(`out: ${speed.toFixed(1)} tok/s`, colors));
+            parts.push(label(`${t('format.out')}: ${speed.toFixed(1)} ${t('format.tokPerSec')}`, colors));
         }
     }
     if (display?.showDuration !== false && ctx.sessionDuration) {
@@ -203,7 +204,7 @@ export function renderSessionLine(ctx) {
         if (usage) {
             const input = formatTokens(usage.input_tokens ?? 0);
             const cache = formatTokens((usage.cache_creation_input_tokens ?? 0) + (usage.cache_read_input_tokens ?? 0));
-            line += label(` (in: ${input}, cache: ${cache})`, colors);
+            line += label(` (${t('format.in')}: ${input}, ${t('format.cache')}: ${cache})`, colors);
         }
     }
     return line;
@@ -249,12 +250,12 @@ function formatUsageWindowPart({ label, percent, resetAt, colors, usageBarEnable
     const reset = formatResetTime(resetAt);
     if (usageBarEnabled) {
         const body = reset
-            ? `${quotaBar(percent ?? 0, barWidth, colors)} ${usageDisplay} (${reset} / ${label})`
+            ? `${quotaBar(percent ?? 0, barWidth, colors)} ${usageDisplay} (${t('format.resetsIn')} ${reset} / ${label})`
             : `${quotaBar(percent ?? 0, barWidth, colors)} ${usageDisplay}`;
         return forceLabel ? `${label}: ${body}` : body;
     }
     return reset
-        ? `${label}: ${usageDisplay} (${reset})`
+        ? `${label}: ${usageDisplay} (${t('format.resetsIn')} ${reset})`
         : `${label}: ${usageDisplay}`;
 }
 function formatResetTime(resetAt) {
