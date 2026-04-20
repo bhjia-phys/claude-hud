@@ -75,18 +75,18 @@ export function renderProjectLine(ctx) {
     if (ctx.extraLabel) {
         parts.push(label(ctx.extraLabel, colors));
     }
-    if (display?.showSpeed) {
-        const speed = getOutputSpeed(ctx.stdin);
-        if (speed !== null) {
-            parts.push(label(`${t('format.out')}: ${speed.toFixed(1)} ${t('format.tokPerSec')}`, colors));
-        }
-    }
     if (display?.showDuration !== false && ctx.sessionDuration) {
         parts.push(label(`⏱️  ${ctx.sessionDuration}`, colors));
     }
     const costEstimate = renderCostEstimate(ctx);
     if (costEstimate) {
         parts.push(costEstimate);
+    }
+    if (display?.showSpeed) {
+        const speed = getOutputSpeed(ctx.stdin);
+        if (speed !== null) {
+            parts.push(label(`${t('format.out')}: ${speed.toFixed(1)} ${t('format.tokPerSec')}`, colors));
+        }
     }
     const customLine = display?.customLine;
     if (customLine) {

@@ -190,19 +190,18 @@ export function renderSessionLine(ctx) {
             parts.push(label(`tok: ${formatTokens(total)} (in: ${formatTokens(st.inputTokens)}, out: ${formatTokens(st.outputTokens)})`, colors));
         }
     }
-    // Session duration
-    if (display?.showSpeed) {
-        const speed = getOutputSpeed(ctx.stdin);
-        if (speed !== null) {
-            parts.push(label(`${t('format.out')}: ${speed.toFixed(1)} ${t('format.tokPerSec')}`, colors));
-        }
-    }
     if (display?.showDuration !== false && ctx.sessionDuration) {
         parts.push(label(`⏱️  ${ctx.sessionDuration}`, colors));
     }
     const costEstimate = renderCostEstimate(ctx);
     if (costEstimate) {
         parts.push(costEstimate);
+    }
+    if (display?.showSpeed) {
+        const speed = getOutputSpeed(ctx.stdin);
+        if (speed !== null) {
+            parts.push(label(`${t('format.out')}: ${speed.toFixed(1)} ${t('format.tokPerSec')}`, colors));
+        }
     }
     if (ctx.extraLabel) {
         parts.push(label(ctx.extraLabel, colors));
