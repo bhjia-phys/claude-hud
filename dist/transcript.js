@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import * as readline from 'readline';
 import { createHash } from 'node:crypto';
 import { getHudPluginDir } from './claude-config-dir.js';
-const TRANSCRIPT_CACHE_VERSION = 2;
+const TRANSCRIPT_CACHE_VERSION = 3;
 let createReadStreamImpl = fs.createReadStream;
 function normalizeTokenCount(value) {
     if (typeof value !== 'number' || !Number.isFinite(value)) {
@@ -68,6 +68,8 @@ function serializeTranscriptData(data) {
         sessionName: data.sessionName,
         lastAssistantResponseAt: data.lastAssistantResponseAt?.toISOString(),
         sessionTokens: data.sessionTokens,
+        lastCompactBoundaryAt: data.lastCompactBoundaryAt?.toISOString(),
+        lastCompactPostTokens: data.lastCompactPostTokens,
     };
 }
 function deserializeTranscriptData(data) {
@@ -87,6 +89,8 @@ function deserializeTranscriptData(data) {
         sessionName: data.sessionName,
         lastAssistantResponseAt: data.lastAssistantResponseAt ? new Date(data.lastAssistantResponseAt) : undefined,
         sessionTokens: normalizeSessionTokens(data.sessionTokens),
+        lastCompactBoundaryAt: data.lastCompactBoundaryAt ? new Date(data.lastCompactBoundaryAt) : undefined,
+        lastCompactPostTokens: typeof data.lastCompactPostTokens === 'number' ? data.lastCompactPostTokens : undefined,
     };
 }
 function readTranscriptCache(transcriptPath, state) {
@@ -151,6 +155,8 @@ export async function parseTranscript(transcriptPath) {
     const taskIdToIndex = new Map();
     let latestSlug;
     let customTitle;
+    let lastCompactBoundaryAt;
+    let lastCompactPostTokens;
     const sessionTokens = {
         inputTokens: 0,
         outputTokens: 0,
@@ -183,6 +189,22 @@ export async function parseTranscript(transcriptPath) {
                     sessionTokens.cacheCreationTokens += normalizeTokenCount(usage.cache_creation_input_tokens);
                     sessionTokens.cacheReadTokens += normalizeTokenCount(usage.cache_read_input_tokens);
                 }
+                // Track Claude Code's compact_boundary marker. Both manual (/compact)
+                // and auto compaction emit this system entry with compactMetadata; we
+                // take the most recent one's timestamp so callers can distinguish a
+                // legitimate post-compact zero frame from a transient stdin glitch.
+                if (entry.type === 'system' && entry.subtype === 'compact_boundary') {
+                    const ts = entry.timestamp ? new Date(entry.timestamp) : null;
+                    if (ts && !Number.isNaN(ts.getTime())) {
+                        if (!lastCompactBoundaryAt || ts.getTime() > lastCompactBoundaryAt.getTime()) {
+                            lastCompactBoundaryAt = ts;
+                            const post = entry.compactMetadata?.postTokens;
+                            lastCompactPostTokens = typeof post === 'number' && Number.isFinite(post) && post >= 0
+                                ? Math.trunc(post)
+                                : undefined;
+                        }
+                    }
+                }
                 processEntry(entry, toolMap, agentMap, taskIdToIndex, latestTodos, result);
             }
             catch {
@@ -199,6 +221,8 @@ export async function parseTranscript(transcriptPath) {
     result.todos = latestTodos;
     result.sessionName = customTitle ?? latestSlug;
     result.sessionTokens = sessionTokens;
+    result.lastCompactBoundaryAt = lastCompactBoundaryAt;
+    result.lastCompactPostTokens = lastCompactPostTokens;
     if (parsedCleanly) {
         writeTranscriptCache(canonicalTranscriptPath, transcriptState, result);
     }
