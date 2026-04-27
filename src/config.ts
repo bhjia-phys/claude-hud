@@ -19,7 +19,7 @@ export type GitBranchOverflowMode = 'truncate' | 'wrap';
  */
 export type ModelFormatMode = 'full' | 'compact' | 'short';
 export type TimeFormatMode = 'relative' | 'absolute' | 'both';
-export type HudElement = 'project' | 'context' | 'usage' | 'promptCache' | 'memory' | 'environment' | 'tools' | 'agents' | 'todos';
+export type HudElement = 'project' | 'context' | 'usage' | 'promptCache' | 'memory' | 'environment' | 'tools' | 'agents' | 'todos' | 'deepseek';
 export type HudColorName =
   | 'dim'
   | 'red'
@@ -119,6 +119,7 @@ export interface HudConfig {
     modelOverride: string;
     customLine: string;
     timeFormat: TimeFormatMode;
+    showDeepseekBalance: boolean;
   };
   colors: HudColorOverrides;
 }
@@ -177,6 +178,7 @@ export const DEFAULT_CONFIG: HudConfig = {
     modelOverride: '',
     customLine: '',
     timeFormat: 'relative',
+    showDeepseekBalance: false,
   },
   colors: {
     context: 'green',
@@ -537,6 +539,9 @@ export function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
     timeFormat: validateTimeFormat(migrated.display?.timeFormat)
       ? migrated.display.timeFormat
       : DEFAULT_CONFIG.display.timeFormat,
+    showDeepseekBalance: typeof migrated.display?.showDeepseekBalance === 'boolean'
+      ? migrated.display.showDeepseekBalance
+      : DEFAULT_CONFIG.display.showDeepseekBalance,
   };
 
   const colors = {

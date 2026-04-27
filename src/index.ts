@@ -10,6 +10,7 @@ import { getMemoryUsage } from "./memory.js";
 import { resolveEffortLevel } from "./effort.js";
 import { applyContextWindowFallback } from "./context-cache.js";
 import { getUsageFromExternalSnapshot } from "./external-usage.js";
+import { getDeepseekBalanceLabel } from "./deepseek-balance.js";
 import { setLanguage, t } from "./i18n/index.js";
 import type { RenderContext } from "./types.js";
 
@@ -98,6 +99,11 @@ export async function main(overrides: Partial<MainDeps> = {}): Promise<void> {
     const extraCmd = deps.parseExtraCmdArg();
     const extraLabel = extraCmd ? await deps.runExtraCmd(extraCmd) : null;
 
+    let deepseekBalance: string | null = null;
+    if (config.display.showDeepseekBalance) {
+      deepseekBalance = await getDeepseekBalanceLabel();
+    }
+
     const sessionDuration = formatSessionDuration(
       transcript.sessionStart,
       deps.now,
@@ -126,6 +132,7 @@ export async function main(overrides: Partial<MainDeps> = {}): Promise<void> {
       memoryUsage,
       config,
       extraLabel,
+      deepseekBalance,
       outputStyle,
       claudeCodeVersion,
       effortLevel: effortInfo?.level,

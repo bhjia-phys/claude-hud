@@ -10,6 +10,7 @@ import { getMemoryUsage } from "./memory.js";
 import { resolveEffortLevel } from "./effort.js";
 import { applyContextWindowFallback } from "./context-cache.js";
 import { getUsageFromExternalSnapshot } from "./external-usage.js";
+import { getDeepseekBalanceLabel } from "./deepseek-balance.js";
 import { setLanguage, t } from "./i18n/index.js";
 export { getUsageFromExternalSnapshot } from "./external-usage.js";
 import { fileURLToPath } from "node:url";
@@ -67,6 +68,10 @@ export async function main(overrides = {}) {
         }
         const extraCmd = deps.parseExtraCmdArg();
         const extraLabel = extraCmd ? await deps.runExtraCmd(extraCmd) : null;
+        let deepseekBalance = null;
+        if (config.display.showDeepseekBalance) {
+            deepseekBalance = await getDeepseekBalanceLabel();
+        }
         const sessionDuration = formatSessionDuration(transcript.sessionStart, deps.now);
         const claudeCodeVersion = config.display.showClaudeCodeVersion
             ? await deps.getClaudeCodeVersion()
@@ -90,6 +95,7 @@ export async function main(overrides = {}) {
             memoryUsage,
             config,
             extraLabel,
+            deepseekBalance,
             outputStyle,
             claudeCodeVersion,
             effortLevel: effortInfo?.level,

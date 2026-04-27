@@ -32,4 +32,7 @@ export const en: Messages = {
   "init.initializing": "[claude-hud] Initializing...",
   "init.macosNote":
     "[claude-hud] Note: On macOS, you may need to restart Claude Code for the HUD to appear.",
+
+  // DeepSeek
+  "label.deepseek": "DeepSeek",
 };

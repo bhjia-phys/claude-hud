@@ -117,6 +117,7 @@ export interface RenderContext {
     memoryUsage: MemoryInfo | null;
     config: HudConfig;
     extraLabel: string | null;
+    deepseekBalance: string | null;
     outputStyle?: string;
     claudeCodeVersion?: string;
     effortLevel?: string;

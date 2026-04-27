@@ -5,4 +5,5 @@ export { renderPromptCacheLine, formatPromptCacheCountdown } from './prompt-cach
 export { renderUsageLine } from './usage.js';
 export { renderMemoryLine } from './memory.js';
 export { renderSessionTokensLine } from './session-tokens.js';
+export { renderDeepseekLine } from './deepseek.js';
 //# sourceMappingURL=index.d.ts.map

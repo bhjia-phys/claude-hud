@@ -161,6 +161,10 @@ export function renderProjectLine(ctx: RenderContext): string | null {
     parts.push(customColor(customLine, colors));
   }
 
+  if (display?.showDeepseekBalance && ctx.deepseekBalance) {
+    parts.push(label(ctx.deepseekBalance, colors));
+  }
+
   if (parts.length === 0) {
     return null;
   }

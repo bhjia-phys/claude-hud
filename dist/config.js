@@ -71,6 +71,7 @@ export const DEFAULT_CONFIG = {
         modelOverride: '',
         customLine: '',
         timeFormat: 'relative',
+        showDeepseekBalance: false,
     },
     colors: {
         context: 'green',
@@ -383,6 +384,9 @@ export function mergeConfig(userConfig) {
         timeFormat: validateTimeFormat(migrated.display?.timeFormat)
             ? migrated.display.timeFormat
             : DEFAULT_CONFIG.display.timeFormat,
+        showDeepseekBalance: typeof migrated.display?.showDeepseekBalance === 'boolean'
+            ? migrated.display.showDeepseekBalance
+            : DEFAULT_CONFIG.display.showDeepseekBalance,
     };
     const colors = {
         context: validateColorValue(migrated.colors?.context)

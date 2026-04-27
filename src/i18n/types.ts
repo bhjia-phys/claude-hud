@@ -25,7 +25,9 @@ export type MessageKey =
   | "format.tokPerSec"
   // Init
   | "init.initializing"
-  | "init.macosNote";
+  | "init.macosNote"
+  // DeepSeek
+  | "label.deepseek";
 
 export type Messages = Record<MessageKey, string>;
 

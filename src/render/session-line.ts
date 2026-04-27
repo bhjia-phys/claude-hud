@@ -293,6 +293,10 @@ export function renderSessionLine(ctx: RenderContext): string {
     parts.push(customColor(customLine, colors));
   }
 
+  if (display?.showDeepseekBalance && ctx.deepseekBalance) {
+    parts.push(label(ctx.deepseekBalance, colors));
+  }
+
   let line = parts.join(' | ');
 
   // Token breakdown at high context
