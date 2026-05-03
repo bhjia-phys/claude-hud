@@ -87,12 +87,19 @@ function deriveSessionId(transcriptPath?: string): string | null {
 }
 
 function findActiveTopic(topicsRoot: string, transcriptPath?: string): string | null {
-  // ONLY per-session mapping — no global fallback.
-  // Sessions not bound to a topic won't show AITP panel.
+  // 1. Per-session mapping (precise)
   const sid = deriveSessionId(transcriptPath);
   if (sid) {
     const smap = readSessionMap(topicsRoot);
     const slug = smap[sid];
+    if (slug && fs.existsSync(path.join(topicsRoot, slug, 'state.md'))) {
+      return slug;
+    }
+  }
+  // 2. Global .current_topic fallback (visual HUD only — low overhead)
+  const marker = path.join(topicsRoot, '.current_topic');
+  if (fs.existsSync(marker)) {
+    const slug = fs.readFileSync(marker, 'utf-8').trim();
     if (slug && fs.existsSync(path.join(topicsRoot, slug, 'state.md'))) {
       return slug;
     }
