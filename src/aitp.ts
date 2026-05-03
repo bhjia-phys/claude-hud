@@ -10,6 +10,7 @@ import * as path from 'node:path';
 
 export interface AitpStatus {
   slug: string;
+  dirPath: string;   // full path to topic directory (for clickable links)
   title: string;
   stage: string;
   posture: string;
@@ -135,6 +136,7 @@ export function readAitpStatus(transcriptPath?: string): AitpStatus | null {
 
     const status: AitpStatus = {
       slug,
+      dirPath: path.join(root, slug),
       title: fm['title'] || slug,
       stage: fm['stage'] || '?',
       posture: fm['posture'] || '',
