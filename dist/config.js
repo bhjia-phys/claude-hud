@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import * as os from 'node:os';
 import { getHudPluginDir } from './claude-config-dir.js';
 export const DEFAULT_ELEMENT_ORDER = [
+    'aitp',
     'project',
     'context',
     'usage',
@@ -72,6 +73,8 @@ export const DEFAULT_CONFIG = {
         customLine: '',
         timeFormat: 'relative',
         showDeepseekBalance: false,
+        showAitp: true,
+        aitpTopicsRoot: '',
     },
     colors: {
         context: 'green',
@@ -387,6 +390,12 @@ export function mergeConfig(userConfig) {
         showDeepseekBalance: typeof migrated.display?.showDeepseekBalance === 'boolean'
             ? migrated.display.showDeepseekBalance
             : DEFAULT_CONFIG.display.showDeepseekBalance,
+        showAitp: typeof migrated.display?.showAitp === 'boolean'
+            ? migrated.display.showAitp
+            : DEFAULT_CONFIG.display.showAitp,
+        aitpTopicsRoot: typeof migrated.display?.aitpTopicsRoot === 'string'
+            ? migrated.display.aitpTopicsRoot.trim()
+            : DEFAULT_CONFIG.display.aitpTopicsRoot,
     };
     const colors = {
         context: validateColorValue(migrated.colors?.context)

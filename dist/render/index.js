@@ -3,7 +3,7 @@ import { renderSessionLine } from './session-line.js';
 import { renderToolsLine } from './tools-line.js';
 import { renderAgentsLine } from './agents-line.js';
 import { renderTodosLine } from './todos-line.js';
-import { renderIdentityLine, renderProjectLine, renderGitFilesLine, renderEnvironmentLine, renderPromptCacheLine, renderUsageLine, renderMemoryLine, renderSessionTokensLine, renderDeepseekLine, } from './lines/index.js';
+import { renderIdentityLine, renderProjectLine, renderGitFilesLine, renderEnvironmentLine, renderPromptCacheLine, renderUsageLine, renderMemoryLine, renderSessionTokensLine, renderDeepseekLine, renderAitpLine, } from './lines/index.js';
 import { dim, RESET } from './colors.js';
 import { getTerminalWidth, UNKNOWN_TERMINAL_WIDTH } from '../utils/terminal.js';
 // eslint-disable-next-line no-control-regex
@@ -307,6 +307,8 @@ function renderElementLine(ctx, element, options) {
             return display?.showTodos === false ? null : renderTodosLine(ctx);
         case 'deepseek':
             return display?.showDeepseekBalance === false ? null : renderDeepseekLine(ctx);
+        case 'aitp':
+            return display?.showAitp === false ? null : renderAitpLine(ctx);
     }
 }
 function renderCompact(ctx) {

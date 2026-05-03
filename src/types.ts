@@ -1,5 +1,6 @@
 import type { HudConfig } from './config.js';
 import type { GitStatus } from './git.js';
+import type { AitpStatus } from './aitp.js';
 
 export interface StdinData {
   transcript_path?: string;
@@ -137,4 +138,5 @@ export interface RenderContext {
   claudeCodeVersion?: string;
   effortLevel?: string;
   effortSymbol?: string;
+  aitpStatus: AitpStatus | null;
 }

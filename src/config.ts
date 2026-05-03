@@ -19,7 +19,7 @@ export type GitBranchOverflowMode = 'truncate' | 'wrap';
  */
 export type ModelFormatMode = 'full' | 'compact' | 'short';
 export type TimeFormatMode = 'relative' | 'absolute' | 'both';
-export type HudElement = 'project' | 'context' | 'usage' | 'promptCache' | 'memory' | 'environment' | 'tools' | 'agents' | 'todos' | 'deepseek';
+export type HudElement = 'project' | 'context' | 'usage' | 'promptCache' | 'memory' | 'environment' | 'tools' | 'agents' | 'todos' | 'deepseek' | 'aitp';
 export type HudColorName =
   | 'dim'
   | 'red'
@@ -48,6 +48,7 @@ export interface HudColorOverrides {
 }
 
 export const DEFAULT_ELEMENT_ORDER: HudElement[] = [
+  'aitp',
   'project',
   'context',
   'usage',
@@ -120,6 +121,8 @@ export interface HudConfig {
     customLine: string;
     timeFormat: TimeFormatMode;
     showDeepseekBalance: boolean;
+    showAitp: boolean;
+    aitpTopicsRoot: string;
   };
   colors: HudColorOverrides;
 }
@@ -179,6 +182,8 @@ export const DEFAULT_CONFIG: HudConfig = {
     customLine: '',
     timeFormat: 'relative',
     showDeepseekBalance: false,
+    showAitp: true,
+    aitpTopicsRoot: '',
   },
   colors: {
     context: 'green',
@@ -542,6 +547,12 @@ export function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
     showDeepseekBalance: typeof migrated.display?.showDeepseekBalance === 'boolean'
       ? migrated.display.showDeepseekBalance
       : DEFAULT_CONFIG.display.showDeepseekBalance,
+    showAitp: typeof migrated.display?.showAitp === 'boolean'
+      ? migrated.display.showAitp
+      : DEFAULT_CONFIG.display.showAitp,
+    aitpTopicsRoot: typeof migrated.display?.aitpTopicsRoot === 'string'
+      ? migrated.display.aitpTopicsRoot.trim()
+      : DEFAULT_CONFIG.display.aitpTopicsRoot,
   };
 
   const colors = {
