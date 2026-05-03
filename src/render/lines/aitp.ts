@@ -113,7 +113,8 @@ export function renderAitpLine(ctx: RenderContext): string | null {
   // Top border
   const title = `AITP · ${s.slug}`;
   const titlePart = visLen(title) > inner - 4 ? title.slice(0, inner - 7) + '..' : title;
-  lines.push(`${cyan('┌─')} ${titlePart} ${cyan('─'.repeat(Math.max(1, inner - visLen(titlePart) - 2)) + '┐')}`);
+  const dashes = '─'.repeat(Math.max(1, inner - visLen(titlePart) - 2));
+  lines.push(cyan(`┌─ ${titlePart} ${dashes}┐`));
 
   // Row 1: Stage + Gate
   lines.push(`${cyan('│')} ${row(
@@ -141,7 +142,7 @@ export function renderAitpLine(ctx: RenderContext): string | null {
   lines.push(`${cyan('│')} ${row(`${yellow('→')} Next ${dim('...')} ${next}`)} ${cyan('│')}`);
 
   // Bottom
-  lines.push(`${cyan('└')}${'─'.repeat(inner)}${cyan('┘')}${RESET}`);
+  lines.push(cyan(`└${'─'.repeat(inner)}┘`));
 
   return lines.join('\n');
 }
