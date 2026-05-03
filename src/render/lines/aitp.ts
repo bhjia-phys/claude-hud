@@ -110,19 +110,11 @@ export function renderAitpLine(ctx: RenderContext): string | null {
 
   const lines: string[] = [];
 
-  // Top border — slug is a clickable link to the topic directory
-  const dirUri = `file:///${s.dirPath.replace(/\\/g, '/')}`;
-  const slugLink = `\x1b]8;;${dirUri}\x1b\\${s.slug}\x1b]8;;\x1b\\`;
-  const title = `AITP · ${slugLink}`;
-  const titleClean = `AITP · ${s.slug}`;
-  const visTitle = visLen(titleClean);
-  const titlePart = visTitle > inner - 4 ? titleClean.slice(0, inner - 7) + '..' : title;
-  // Rebuild with link if not truncated
-  const displayTitle = visTitle > inner - 4
-    ? titlePart
-    : `AITP · ${slugLink}`;
+  // Top border
+  const title = `AITP · ${s.slug}`;
+  const titlePart = visLen(title) > inner - 4 ? title.slice(0, inner - 7) + '..' : title;
   const dashes = '─'.repeat(Math.max(1, inner - visLen(titlePart) - 2));
-  lines.push(cyan(`┌─ ${displayTitle} ${dashes}┐`));
+  lines.push(cyan(`┌─ ${titlePart} ${dashes}┐`));
 
   // Row 1: Stage + Gate
   lines.push(`${cyan('│')} ${row(
@@ -148,6 +140,9 @@ export function renderAitpLine(ctx: RenderContext): string | null {
   // Row 4: Next action
   const next = nextAction(s);
   lines.push(`${cyan('│')} ${row(`${yellow('→')} Next ${dim('...')} ${next}`)} ${cyan('│')}`);
+
+  // Path line (plain URL, no fancy link)
+  lines.push(`${cyan('│')} ${padRight(dim(s.dirPath), inner)} ${cyan('│')}`);
 
   // Bottom
   lines.push(cyan(`└${'─'.repeat(inner)}┘`));
