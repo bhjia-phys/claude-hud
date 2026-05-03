@@ -87,7 +87,8 @@ function deriveSessionId(transcriptPath?: string): string | null {
 }
 
 function findActiveTopic(topicsRoot: string, transcriptPath?: string): string | null {
-  // 1. Per-session mapping
+  // ONLY per-session mapping — no global fallback.
+  // Sessions not bound to a topic won't show AITP panel.
   const sid = deriveSessionId(transcriptPath);
   if (sid) {
     const smap = readSessionMap(topicsRoot);
@@ -96,34 +97,7 @@ function findActiveTopic(topicsRoot: string, transcriptPath?: string): string | 
       return slug;
     }
   }
-
-  // 2. Global .current_topic marker
-  const marker = path.join(topicsRoot, '.current_topic');
-  if (fs.existsSync(marker)) {
-    const slug = fs.readFileSync(marker, 'utf-8').trim();
-    if (slug && fs.existsSync(path.join(topicsRoot, slug, 'state.md'))) {
-      return slug;
-    }
-  }
-
-  // 3. Fallback: most recently modified state.md
-  let bestSlug: string | null = null;
-  let bestMtime = 0;
-  try {
-    for (const entry of fs.readdirSync(topicsRoot)) {
-      if (entry.startsWith('.')) continue;
-      const statePath = path.join(topicsRoot, entry, 'state.md');
-      if (!fs.existsSync(statePath)) continue;
-      try {
-        const mtime = fs.statSync(statePath).mtimeMs;
-        if (mtime > bestMtime) {
-          bestMtime = mtime;
-          bestSlug = entry;
-        }
-      } catch { /* skip */ }
-    }
-  } catch { /* skip */ }
-  return bestSlug;
+  return null;
 }
 
 export function readAitpStatus(transcriptPath?: string): AitpStatus | null {
