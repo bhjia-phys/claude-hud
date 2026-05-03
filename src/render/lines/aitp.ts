@@ -7,6 +7,14 @@
 import type { RenderContext } from '../../types.js';
 import { dim, cyan, yellow, red, green, magenta, RESET } from '../colors.js';
 
+// ── OSC 8 hyperlink ─────────────────────────────────────────────
+
+function hyperlink(uri: string, text: string): string {
+  const esc = '\x1b';
+  const st = '\\';
+  return `${esc}]8;;${uri}${esc}${st}${text}${esc}]8;;${esc}${st}`;
+}
+
 // ── helpers ─────────────────────────────────────────────────────
 
 function laneShort(lane: string): string {
@@ -69,8 +77,11 @@ function nextAction(s: { stage: string; activity: string; posture: string; gateS
 // ── pad to visible width (accounting for ANSI escapes) ──────────
 
 function visLen(s: string): number {
+  // Strip SGR (CSI ... m) and OSC 8 hyperlinks (both BEL and ST terminators)
   // eslint-disable-next-line no-control-regex
-  return s.replace(/\x1b\[[0-9;]*m/g, '').length;
+  return s.replace(/\x1b\[[0-9;]*m/g, '')
+          .replace(/\x1b]8;;.*?(\x07|\x1b\\)/g, '')
+          .length;
 }
 
 function padRight(s: string, width: number): string {
@@ -141,9 +152,14 @@ export function renderAitpLine(ctx: RenderContext): string | null {
   const next = nextAction(s);
   lines.push(`${cyan('│')} ${row(`${yellow('→')} Next ${dim('...')} ${next}`)} ${cyan('│')}`);
 
-  // Path line — visible file:// URL, terminals may auto-detect as clickable
+  // Path line — clickable file:// link via OSC 8
   const fileUrl = `file:///${s.dirPath.replace(/\\/g, '/')}`;
-  lines.push(`${cyan('│')} ${padRight(dim(fileUrl), inner)} ${cyan('│')}`);
+  lines.push(`${cyan('│')} ${padRight(dim(hyperlink(fileUrl, fileUrl)), inner)} ${cyan('│')}`);
+
+  // Dashboard link (clickable HTTP link)
+  const dashUrl = `http://127.0.0.1:8765`;
+  const dashLabel = 'AITP Dashboard →';
+  lines.push(`${cyan('│')} ${padRight(cyan(hyperlink(dashUrl, `${dashLabel}  ${dashUrl}`)), inner)} ${cyan('│')}`);
 
   // Bottom
   lines.push(cyan(`└${'─'.repeat(inner)}┘`));
