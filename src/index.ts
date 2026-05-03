@@ -121,7 +121,7 @@ export async function main(overrides: Partial<MainDeps> = {}): Promise<void> {
         : null;
 
     const aitpStatus = config.display.showAitp !== false
-      ? readAitpStatus()
+      ? readAitpStatus(stdin.transcript_path)
       : null;
 
     const ctx: RenderContext = {

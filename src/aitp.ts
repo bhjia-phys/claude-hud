@@ -69,8 +69,35 @@ function parseFrontmatter(text: string): Record<string, string> {
   return fm;
 }
 
-function findActiveTopic(topicsRoot: string): string | null {
-  // Check .current_topic marker
+function readSessionMap(topicsRoot: string): Record<string, string> {
+  const smapFile = path.join(topicsRoot, '.session_map.json');
+  if (!fs.existsSync(smapFile)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(smapFile, 'utf-8'));
+  } catch {
+    return {};
+  }
+}
+
+function deriveSessionId(transcriptPath?: string): string | null {
+  if (!transcriptPath) return null;
+  // Extract filename without extension as session ID
+  const basename = path.basename(transcriptPath, '.jsonl');
+  return basename || transcriptPath;
+}
+
+function findActiveTopic(topicsRoot: string, transcriptPath?: string): string | null {
+  // 1. Per-session mapping
+  const sid = deriveSessionId(transcriptPath);
+  if (sid) {
+    const smap = readSessionMap(topicsRoot);
+    const slug = smap[sid];
+    if (slug && fs.existsSync(path.join(topicsRoot, slug, 'state.md'))) {
+      return slug;
+    }
+  }
+
+  // 2. Global .current_topic marker
   const marker = path.join(topicsRoot, '.current_topic');
   if (fs.existsSync(marker)) {
     const slug = fs.readFileSync(marker, 'utf-8').trim();
@@ -79,7 +106,7 @@ function findActiveTopic(topicsRoot: string): string | null {
     }
   }
 
-  // Fallback: most recently modified state.md
+  // 3. Fallback: most recently modified state.md
   let bestSlug: string | null = null;
   let bestMtime = 0;
   try {
@@ -99,11 +126,11 @@ function findActiveTopic(topicsRoot: string): string | null {
   return bestSlug;
 }
 
-export function readAitpStatus(): AitpStatus | null {
+export function readAitpStatus(transcriptPath?: string): AitpStatus | null {
   const root = resolveTopicsRoot();
   if (!root) return null;
 
-  const slug = findActiveTopic(root);
+  const slug = findActiveTopic(root, transcriptPath);
   if (!slug) return null;
 
   const statePath = path.join(root, slug, 'state.md');

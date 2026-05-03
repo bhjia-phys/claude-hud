@@ -84,7 +84,7 @@ export async function main(overrides = {}) {
             ? await deps.getMemoryUsage()
             : null;
         const aitpStatus = config.display.showAitp !== false
-            ? readAitpStatus()
+            ? readAitpStatus(stdin.transcript_path)
             : null;
         const ctx = {
             stdin,
