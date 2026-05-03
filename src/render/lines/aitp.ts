@@ -141,8 +141,9 @@ export function renderAitpLine(ctx: RenderContext): string | null {
   const next = nextAction(s);
   lines.push(`${cyan('│')} ${row(`${yellow('→')} Next ${dim('...')} ${next}`)} ${cyan('│')}`);
 
-  // Path line (plain URL, no fancy link)
-  lines.push(`${cyan('│')} ${padRight(dim(s.dirPath), inner)} ${cyan('│')}`);
+  // Path line — visible file:// URL, terminals may auto-detect as clickable
+  const fileUrl = `file:///${s.dirPath.replace(/\\/g, '/')}`;
+  lines.push(`${cyan('│')} ${padRight(dim(fileUrl), inner)} ${cyan('│')}`);
 
   // Bottom
   lines.push(cyan(`└${'─'.repeat(inner)}┘`));
