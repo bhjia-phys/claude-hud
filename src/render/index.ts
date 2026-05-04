@@ -17,6 +17,7 @@ import {
   renderDeepseekLine,
   renderAitpLine,
 } from './lines/index.js';
+import { renderCronLine } from './lines/cron.js';
 import { dim, RESET } from './colors.js';
 import { getTerminalWidth, UNKNOWN_TERMINAL_WIDTH } from '../utils/terminal.js';
 
@@ -483,6 +484,12 @@ function renderExpanded(ctx: RenderContext, terminalWidth: number | null = null)
   const gitFilesLine = renderGitFilesLine(ctx, terminalWidth);
   if (gitFilesLine) {
     lines.push({ line: gitFilesLine, isActivity: false });
+  }
+
+  // Cron status line — below everything
+  const cronLine = renderCronLine(ctx);
+  if (cronLine) {
+    lines.push({ line: cronLine, isActivity: false });
   }
 
   return lines;

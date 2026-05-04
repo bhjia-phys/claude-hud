@@ -24,6 +24,14 @@ export interface AitpStatus {
   l4Job: string;
   l4Eta: string;
   l4Host: string;
+  cronJobs: CronJob[];
+}
+
+export interface CronJob {
+  id: string;
+  cron: string;
+  prompt: string;
+  recurring: boolean;
 }
 
 interface CacheEntry {
@@ -85,6 +93,30 @@ function deriveSessionId(transcriptPath?: string): string | null {
   // Extract filename without extension as session ID
   const basename = path.basename(transcriptPath, '.jsonl');
   return basename || transcriptPath;
+}
+
+function readCronJobs(): CronJob[] {
+  // Read from project-local .claude/scheduled_tasks.json
+  const cwd = process.cwd();
+  const candidates = [
+    path.join(cwd, '.claude', 'scheduled_tasks.json'),
+    path.join(process.env['HOME'] || process.env['USERPROFILE'] || '', '.claude', 'scheduled_tasks.json'),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      try {
+        const data = JSON.parse(fs.readFileSync(p, 'utf-8'));
+        const tasks = data.tasks || [];
+        return tasks.map((t: any) => ({
+          id: t.id || '?',
+          cron: t.cron || '',
+          prompt: t.prompt || '',
+          recurring: t.recurring !== false,
+        }));
+      } catch { /* skip broken files */ }
+    }
+  }
+  return [];
 }
 
 function findActiveTopic(topicsRoot: string, transcriptPath?: string): string | null {
@@ -150,6 +182,7 @@ export function readAitpStatus(transcriptPath?: string): AitpStatus | null {
       l4Job: fm['l4_job_id'] || '',
       l4Eta: fm['l4_job_estimated_time'] || '',
       l4Host: fm['l4_job_host'] || fm['compute'] || '',
+      cronJobs: readCronJobs(),
     };
 
     _cache = { mtime, status };
